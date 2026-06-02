@@ -1154,7 +1154,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .drawer-container {
   position: fixed;
-  inset-y: 0;
+  top: 0;
+  bottom: 0;
   left: 0;
   z-index: 50;
   width: 100%;
@@ -2001,6 +2002,22 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 0.05em;
   color: var(--color-white);
   text-transform: uppercase;
+}
+
+/* Background hexagons graphic in Hero */
+.hero-bg-graphic {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.15;
+  filter: blur(2px);
+}
+
+@media (max-width: 768px) {
+  .hero-bg-graphic {
+    display: none !important;
+  }
 }
 
 

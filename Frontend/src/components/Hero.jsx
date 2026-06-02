@@ -40,7 +40,7 @@ export default function Hero({
   return (
     <div className="hero-section">
       {/* Background Graphic Patterns */}
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-10">
+      <div className="hero-bg-graphic">
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="hexagons" width="50" height="43.3" patternUnits="userSpaceOnUse" patternTransform="scale(2)">
@@ -50,8 +50,8 @@ export default function Hero({
           <rect width="100%" height="100%" fill="url(#hexagons)" />
         </svg>
         {/* Spotlights */}
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#FFC000]/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-[#29ABE2]/5 rounded-full blur-[150px] pointer-events-none" />
+        <div style={{ position: 'absolute', top: '25%', left: '25%', width: '500px', height: '500px', backgroundColor: 'rgba(255, 192, 0, 0.08)', borderRadius: '50%', filter: 'blur(100px)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: '25%', right: '25%', width: '600px', height: '600px', backgroundColor: 'rgba(41, 171, 226, 0.04)', borderRadius: '50%', filter: 'blur(120px)', pointerEvents: 'none' }} />
       </div>
 
       <div className="hero-grid container-lambo relative z-10">

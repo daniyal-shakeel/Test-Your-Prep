@@ -21,15 +21,19 @@ export default function Quiz({
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [showQuestionMap, setShowQuestionMap] = useState(true);
   const [jumpInput, setJumpInput] = useState('');
+  const [showSaveFeedback, setShowSaveFeedback] = useState(false);
 
   // Store refs to keep values updated inside event listeners/unload handlers
   const saveStateRef = useRef({ currentIdx, userAnswers });
+  const isSubmittingRef = useRef(false);
+
   useEffect(() => {
     saveStateRef.current = { currentIdx, userAnswers };
   }, [currentIdx, userAnswers]);
 
   // Debounced auto-save hook
   useEffect(() => {
+    if (isSubmittingRef.current) return;
     const delayDebounceFn = setTimeout(() => {
       if (onSaveDraft) {
         onSaveDraft(saveStateRef.current.currentIdx, saveStateRef.current.userAnswers);
@@ -42,7 +46,7 @@ export default function Quiz({
   // Save when the page is unloaded, refreshed, or tab closed (immediate save)
   useEffect(() => {
     const handleBeforeUnload = () => {
-      if (onSaveDraft) {
+      if (!isSubmittingRef.current && onSaveDraft) {
         onSaveDraft(saveStateRef.current.currentIdx, saveStateRef.current.userAnswers);
       }
     };
@@ -51,9 +55,19 @@ export default function Quiz({
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       // Save immediately on unmount (e.g. when user exits to homepage)
-      handleBeforeUnload();
+      if (!isSubmittingRef.current) {
+        handleBeforeUnload();
+      }
     };
   }, [onSaveDraft]);
+
+  const handleManualSave = () => {
+    if (onSaveDraft) {
+      onSaveDraft(currentIdx, userAnswers);
+      setShowSaveFeedback(true);
+      setTimeout(() => setShowSaveFeedback(false), 2000);
+    }
+  };
 
   if (!mcqs || mcqs.length === 0) {
     return (
@@ -113,6 +127,7 @@ export default function Quiz({
   };
 
   const handleSubmit = () => {
+    isSubmittingRef.current = true;
     onSubmitTest(userAnswers);
   };
 
@@ -252,6 +267,22 @@ export default function Quiz({
               >
                 <ChevronLeft size={14} />
                 PREV
+              </button>
+
+              <button
+                onClick={handleManualSave}
+                className="btn-ghost"
+                style={{ gap: '6px' }}
+                title="Save current progress into drafts manually"
+              >
+                {showSaveFeedback ? (
+                  <>
+                    <Check size={14} className="text-lambo-cyan" />
+                    SAVED!
+                  </>
+                ) : (
+                  "SAVE DRAFT"
+                )}
               </button>
 
               <button

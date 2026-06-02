@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -14,9 +14,38 @@ import { mcqs } from './assets/mcqs';
 import { answers } from './assets/answers';
 import { subjects } from './assets/subjects';
 
-const HISTORY_KEY = 'mcq_app_history_v1';
-const DRAFTS_KEY = 'mcq_app_drafts_v1';
-const LEGACY_HISTORY_KEY = 'mad_quiz_prep_history';
+const HISTORY_KEY = 'typ_mcq_app_history_v1';
+const DRAFTS_KEY = 'typ_mcq_app_drafts_v1';
+const LEGACY_HISTORY_KEY = 'typ_mad_quiz_prep_history';
+const DISCLAIMER_KEY = 'typ_disclaimer_accepted';
+
+// Self-executing migration block to copy old localStorage keys to prefixed keys to prevent data loss
+(() => {
+  try {
+    const oldHistory = localStorage.getItem('mcq_app_history_v1');
+    if (oldHistory) {
+      localStorage.setItem(HISTORY_KEY, oldHistory);
+      localStorage.removeItem('mcq_app_history_v1');
+    }
+    const oldDrafts = localStorage.getItem('mcq_app_drafts_v1');
+    if (oldDrafts) {
+      localStorage.setItem(DRAFTS_KEY, oldDrafts);
+      localStorage.removeItem('mcq_app_drafts_v1');
+    }
+    const oldDisclaimer = localStorage.getItem('disclaimer_accepted');
+    if (oldDisclaimer) {
+      localStorage.setItem(DISCLAIMER_KEY, oldDisclaimer);
+      localStorage.removeItem('disclaimer_accepted');
+    }
+    const legacyHistory = localStorage.getItem('mad_quiz_prep_history');
+    if (legacyHistory) {
+      localStorage.setItem(HISTORY_KEY, legacyHistory);
+      localStorage.removeItem('mad_quiz_prep_history');
+    }
+  } catch (e) {
+    console.error("Failed to migrate old localStorage keys:", e);
+  }
+})();
 
 export default function App() {
   const [activePage, setActivePage] = useState('home'); // 'home', 'quiz', 'results', 'bank'
@@ -50,7 +79,7 @@ export default function App() {
   const [currentAttemptAnswers, setCurrentAttemptAnswers] = useState({});
   const [showDisclaimerModal, setShowDisclaimerModal] = useState(() => {
     try {
-      const accepted = localStorage.getItem('disclaimer_accepted');
+      const accepted = localStorage.getItem(DISCLAIMER_KEY);
       return !accepted;
     } catch {
       return true;
@@ -70,6 +99,18 @@ export default function App() {
 
   const activeSubject = subjects.find(s => s.id === selectedSubjectId) || subjects[0];
   const activeCategory = activeSubject.categories.find(c => c.id === selectedCategoryId) || activeSubject.categories[0];
+
+  // Disable body scrolling when the history/drafts drawer is open
+  useEffect(() => {
+    if (isHistoryOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isHistoryOpen]);
 
   // Save attempt and update log based on dynamically selected subject/category pool
   const handleFinishedQuiz = (userAnswers) => {
@@ -232,7 +273,7 @@ export default function App() {
 
   const handleAcceptDisclaimer = () => {
     try {
-      localStorage.setItem('disclaimer_accepted', 'true');
+      localStorage.setItem(DISCLAIMER_KEY, 'true');
     } catch (e) {
       console.error(e);
     }
