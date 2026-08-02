@@ -26,5 +26,19 @@ export const subjects = [
         "name": "Finals"
       }
     ]
+  },
+  {
+    "id": "tech-entrepreneurship",
+    "name": "Tech Entrepreneurship",
+    "categories": [
+      {
+        "id": "mids",
+        "name": "Mids"
+      },
+      {
+        "id": "finals",
+        "name": "Finals"
+      }
+    ]
   }
 ];
